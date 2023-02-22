@@ -124,7 +124,6 @@ for ( i in names(d.traj) ) {
     d.traj[[i]][[j]]$markers <- list( right = do.call( rbind.data.frame , d.traj[[i]][[j]]$markers[ , , 1] ) %>% `colnames<-`( c("x","y","z") ),
                                       left = do.call( rbind.data.frame , d.traj[[i]][[j]]$markers[ , , 2] ) %>% `colnames<-`( c("x","y","z") ) )
     
-    
   }
 }
 
@@ -152,6 +151,7 @@ for ( i in names(d.traj) ) {
     df[[i]][[j]] <- do.call( rbind.data.frame, d.traj[[i]][[j]]$coords.mm ) %>%
       add_column( contact = sub( ".*\\.", "", rownames(.) ), .before = 1 ) %>% # add contact number (smaller = more ventral)
       add_column( hemisphere = sub( "\\..*", "", rownames(.) ), .before = 1 ) %>% # add hemisphere
+      add_column( elmodel = NA, .after = "hemisphere" ) %>% # prepare a column for electrode model
       add_column( space = j , .before = 1 ) # add space
   }
   
@@ -160,8 +160,11 @@ for ( i in names(d.traj) ) {
   
 }
 
-# final touches - collapse to a single long table and tidy the rownames
+# collapse to a single long table and tidy the rownames
 df <- do.call( rbind.data.frame, df ) %>% `rownames<-`( 1:nrow(.) )
+
+# finishing touches - add the elctrode model
+for ( i in 1:nrow(df) ) df$elmodel[i] <- with( df, d.traj[[id[i]]]$props[ hemisphere[i], "elmodel" ] )
 
 # save as csv
 write.table( df, file = "data/traj/trajectories.csv", sep = ",", row.names = F )
