@@ -77,7 +77,7 @@ for ( i in names(VAT.path) ) {
 # prepare a folder for trajectories
 if( !dir.exists("data/traj") ) dir.create( "data/traj" )
 
-# loop through patients to copy their raw ea_recontruction files
+# loop through patients to copy their raw ea_reconstruction files
 for ( i in id ) {
   # prepare a folder for patient "i"
   if( !dir.exists( paste0("data/traj/", i) ) ) dir.create( paste0("data/traj/", i) )
@@ -87,8 +87,7 @@ for ( i in id ) {
 }
 
 # next read the MatLab files
-# using 'sapply' instead of 'lapply' to extract names as well, in this case, we'll end up with a list anyway
-d.traj <- sapply( id, function(i) readMat( paste( d.dir, i, "ea_reconstruction.mat", sep = "/") )$reco )
+d.traj <- lapply( id, function(i) readMat( paste( d.dir, i, "ea_reconstruction.mat", sep = "/") )$reco ) %>% `names<-`(id)
 
 # loop through the files to get them into a nice format
 for ( i in names(d.traj) ) {
